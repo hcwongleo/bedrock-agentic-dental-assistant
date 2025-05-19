@@ -1,8 +1,8 @@
 {
-  "name": "auto-loan-application",
+  "name": "automated-dental-assistant",
   "version": "1.0.0",
   "type": "module",
-  "description": "Automate loan application",
+  "description": "Automated dental order processing system",
   "workspaces": [
     "packages/*"
   ],
@@ -18,7 +18,7 @@
     "deploy-all": "npm run deploy-backend && npm run deploy-frontend",
     "clean-node-modules": "FORCE_COLOR=1 npm run -w infra clean-node-modules"
   },
-  "author": "Jady Liu",
+  "author": "AWS GenAI Labs",
   "volta": {
     "node": "22.13.1"
   },

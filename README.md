@@ -1,8 +1,8 @@
-# Guidance for Agentic Workflows for Intelligent Document Processing on AWS
+# Guidance for Agentic Workflows for Intelligent Dental Order Processing on AWS
 
 ## Overview
 
-This repository provides an automated loan application processing system that streamlines document submission, verification, underwriting and approval processes. The solution helps financial institutions reduce manual processing time, minimize errors, and provide better customer experience through AI-powered document processing and validation.
+This repository provides an automated dental order processing system that streamlines order submission, verification, and approval processes. The solution helps dental laboratories reduce manual processing time, minimize errors, and provide better customer experience through AI-powered order processing and validation.
 
 ## Table of Contents
 
@@ -21,12 +21,13 @@ This repository provides an automated loan application processing system that st
 
 ## Key Features
 
-- Intelligent document upload and processing (PDF/Images)
-- Automated data extraction from key documents
-- Real-time document validation and verification
-- Automated loan application form completion
-- DTI calculation and pre-approval letter generation
-- Interactive chatbot for loan process assistance
+- Intelligent dental order processing
+- Automated data extraction from dental orders
+- Real-time order validation and verification
+- Automated dental order form completion
+- Interactive chatbot for dental order assistance
+- Tooth position validation using FDI numbering system
+- Product and material compatibility verification
 
 ## Architecture
 
@@ -36,11 +37,11 @@ This repository provides an automated loan application processing system that st
 
 The system creates and manages:
 - Bedrock data automation blueprints for data extraction
-- Bedrock multi-agents for document verification, DTI calculation
-- Secure document storage system
-- Application form auto-completion
-- Pre-approval letter generation
-- Chatbot integration for applicant
+- Bedrock multi-agents for order verification and validation
+- Secure order storage system
+- Order form auto-completion
+- Order confirmation generation
+- Chatbot integration for dentists and technicians
 
 ## Demo Script
 
@@ -68,7 +69,7 @@ aws configure set region YOUR_REGION
 1. Clone this repository
 2. Install npm modules
 ```bash
-cd auto-loan-application
+cd bedrock-agentic-dental-assistant
 npm run install-packages
 ```
 3. Deploy the backend and frontend
@@ -85,7 +86,7 @@ npm run deploy-frontend
 ```
 4. Access to the application from [Cloudfront distribution URL](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.SimpleDistribution.html), you can get this URL from the Cloudformation output with script:
 ```bash
-aws cloudformation describe-stacks --stack-name $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE | jq -r '.StackSummaries[] | select(.StackName | startswith("AutoLoanAPPwebsitewafstack")) | .StackName') --query 'Stacks[0].Outputs[?OutputKey==`configwebsitedistributiondomain`].OutputValue' --output text
+aws cloudformation describe-stacks --stack-name $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE | jq -r '.StackSummaries[] | select(.StackName | startswith("DentalAssistantwebsitewafstack")) | .StackName') --query 'Stacks[0].Outputs[?OutputKey==`configwebsitedistributiondomain`].OutputValue' --output text
 ```
 5. [Create cognito user](https://docs.aws.amazon.com/cognito/latest/developerguide/how-to-create-user-accounts.html#creating-a-new-user-using-the-console) in the user pool to access the application
 6. Delete the stack. We recommend using the AWS CloudFormation service page to delete/manage your CDK stacks as it offers many options to monitor stack drifts, identify errors, and provides better stability. 
@@ -101,7 +102,7 @@ Note:
   - Any remaining S3 buckets and their contents
 
 ## Cost Estimation
-- Approximate cost: The Auto Loan Application will cost $226 per month for 1,000 pages, 28,800 requests (us-east-1 region, April 2025)
+- Approximate cost: The Dental Assistant Application will cost $226 per month for 1,000 orders, 28,800 requests (us-east-1 region, April 2025)
 - Recommend setting up [AWS Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html)
 
 ### Cost Breakdown
@@ -110,8 +111,8 @@ Below you can see the estimated costs of the guidance solution and the assumptio
 
 | AWS service | Dimensions | Cost [USD] |
 |----------|----------|----------|
-| Amazon Bedrock Data Automation    | 1,000 documents (each 1 page) processed with Bedrock Data Automation     | $40  |
-| Amazon Bedrock Agent - Claude Sonnet 3.5 v2    | Average 2 requsts to the Bedrock agent per mintues, input tokens 1000 per request, output tokens 200 per request    | $173    |
+| Amazon Bedrock Data Automation    | 1,000 orders processed with Bedrock Data Automation     | $40  |
+| Amazon Bedrock Agent - Claude Sonnet 3.5 v2    | Average 2 requests to the Bedrock agent per minute, input tokens 1000 per request, output tokens 200 per request    | $173    |
 | AWS Lambda    | 28,800 requests per month on Arm with 512 MB ephemeral storage, 30s execution time     | $0.32     |
 | Amazon EventBridge    | 1 million events     | $1     |
 | Amazon Simple Storage Service (S3)   |  S3 Standard storage (10 GB per month)     | $0.24     |
@@ -119,9 +120,9 @@ Below you can see the estimated costs of the guidance solution and the assumptio
 | Amazon Cognito     | 100 monthly active users (MAU) with Advanced security feature (WAF)     | $10.75    |
 
 ### FAQ
-Q: Why isn't the review page showing the application list?
+Q: Why isn't the review page showing the order list?
 
-A: If you're not seeing the application list on the review page, try clicking the `Clear` Button to refresh the view. 
+A: If you're not seeing the order list on the review page, try clicking the `Clear` Button to refresh the view. 
 ![](./packages/webapp/src/assets/faq_1.png)
 
 Q: How can I clear my conversation history and terminate the current session?

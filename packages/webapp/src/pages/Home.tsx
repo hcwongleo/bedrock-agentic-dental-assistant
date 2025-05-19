@@ -40,14 +40,14 @@ export const Home = () => {
                                     variant="h1"
                                     padding="n"
                                 >
-                                    Automated Loan Application
+                                    Automated Dental Assistant
                                 </Box>
                                 <Box
                                     fontSize="heading-xl"
                                     variant="p"
                                     color="text-body-secondary"
                                 >
-                                    Your AI-powered Loan automation application system
+                                    Your AI-powered Dental Order Processing System
                                 </Box>
                             </Box>
                         </Container>
@@ -82,7 +82,7 @@ export const Home = () => {
                                 items={[
                                     {
                                         value: "applicant",
-                                        label: "Applicant",
+                                        label: "Dentist",
                                         description: (
                                             <div style={{
                                                 marginTop: '8px',
@@ -91,11 +91,12 @@ export const Home = () => {
                                             }}>
                                                 <img 
                                                     src={ApplicantRole} 
-                                                    alt="Applicant Role"
+                                                    alt="Dentist Role"
                                                     style={{
                                                         width: "100%",
                                                         display: "block"
                                                     }}
+                                                />
                                                 />
                                             </div>
                                         )
@@ -116,7 +117,7 @@ export const Home = () => {
                                 items={[
                                     {
                                         value: "broker",
-                                        label: "Broker",
+                                        label: "Technician",
                                         description: (
                                             <div style={{
                                                 marginTop: '8px',
@@ -125,7 +126,7 @@ export const Home = () => {
                                             }}>
                                                 <img 
                                                     src={BrokerRole} 
-                                                    alt="Broker Role"
+                                                    alt="Technician Role"
                                                     style={{
                                                         width: "100%",
                                                         display: "block"

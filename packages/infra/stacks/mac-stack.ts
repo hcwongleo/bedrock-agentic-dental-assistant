@@ -15,10 +15,10 @@ import { lambdaArchitecture, lambdaRuntime } from "../config/AppConfig";
 export class MacStack extends Stack {
     public agentId: string;
     public agentAliasId: string;
-    public broker_agent: bedrock.Agent;
-    public broker_agentAlias:_bedrock.CfnAgentAlias;
-    public loan_application_assistant_agent: bedrock.Agent;
-    public loan_application_assistant_agentAlias:_bedrock.CfnAgentAlias;
+    public technician_agent: bedrock.Agent;
+    public technician_agentAlias:_bedrock.CfnAgentAlias;
+    public dentist_assistant_agent: bedrock.Agent;
+    public dentist_assistant_agentAlias:_bedrock.CfnAgentAlias;
 
     
     constructor(scope: Construct, id: string, props: StackProps) {
@@ -91,26 +91,26 @@ export class MacStack extends Stack {
             }
         });
 
-        /* BROKER AGENT + action group */
-        this.broker_agent = new bedrock.Agent(this, "broker_agent_agent", {
-            name: `broker_agent`,
+        /* TECHNICIAN AGENT + action group */
+        this.technician_agent = new bedrock.Agent(this, "technician_agent", {
+            name: `technician_agent`,
             foundationModel: bedrock.BedrockFoundationModel.AMAZON_NOVA_PRO_V1,
-            instruction: MACConfig.MACAgentInstruction.BrokerAgent,
+            instruction: MACConfig.MACAgentInstruction.TechnicianAgent,
             shouldPrepareAgent: true,
-            description: MACConfig.MACDescription.BrokerAgent
+            description: MACConfig.MACDescription.TechnicianAgent
         })
 
-        const broker_agentAlias = new _bedrock.CfnAgentAlias(this, 'broker_agentAlias', {
-            agentAliasName: `broker_agent`,
-            agentId: this.broker_agent.agentId,
+        const technician_agentAlias = new _bedrock.CfnAgentAlias(this, 'technician_agentAlias', {
+            agentAliasName: `technician_agent`,
+            agentId: this.technician_agent.agentId,
         });
 
-        /* ASSISTANT AGENT + action group */
-        const LoanAssistantActionGroup_lambda = new lambda_python.PythonFunction(this, 'LoanActionGroup_lambda', {
+        /* DENTIST ASSISTANT AGENT + action group */
+        const DentistAssistantActionGroup_lambda = new lambda_python.PythonFunction(this, 'DentistActionGroup_lambda', {
             runtime: lambdaRuntime,
             architecture: lambdaArchitecture,
             handler: 'lambda_handler',
-            index: 'loan_applicant_function.py',
+            index: 'dentist_assistant_function.py',
             entry: path.join(__dirname, '../lambda/python/bedrock-action-group-lambda'),
             timeout: cdk.Duration.minutes(5),
             memorySize: 1024,
@@ -119,7 +119,7 @@ export class MacStack extends Stack {
             },
         });
 
-        LoanAssistantActionGroup_lambda.addToRolePolicy(new iam.PolicyStatement({
+        DentistAssistantActionGroup_lambda.addToRolePolicy(new iam.PolicyStatement({
             actions: [
                 "s3:*",
                 "kms:Decrypt",
@@ -130,54 +130,56 @@ export class MacStack extends Stack {
             resources: ["*"],
         }));
 
-        const LoanAssistantActionGroup = new AgentActionGroup({
-            name: `loan_action_group`,
-            description: 'Handle applicant information collection and document review for loan applicants.',
-            executor: bedrock.ActionGroupExecutor.fromlambdaFunction(LoanAssistantActionGroup_lambda),
+        const DentistAssistantActionGroup = new AgentActionGroup({
+            name: `dentist_action_group`,
+            description: 'Handle dental order information collection and verification for dentists.',
+            executor: bedrock.ActionGroupExecutor.fromlambdaFunction(DentistAssistantActionGroup_lambda),
             enabled: true,
-            functionSchema: MACConfig.LoanApplicationActionGroup,
+            functionSchema: MACConfig.DentalOrderActionGroup,
         });
 
-        this.loan_application_assistant_agent = new bedrock.Agent(this, "loan_application_assistant_agent", {
-            name: `loan_application_assistant`,
+        this.dentist_assistant_agent = new bedrock.Agent(this, "dentist_assistant_agent", {
+            name: `dentist_assistant`,
             foundationModel: bedrock.BedrockFoundationModel.AMAZON_NOVA_PRO_V1,
-            instruction: MACConfig.MACAgentInstruction.LoanAppAssistant,
+            instruction: MACConfig.MACAgentInstruction.DentistAssistant,
             shouldPrepareAgent: true,
-            description: MACConfig.MACDescription.LoanAppAssistant,
+            description: MACConfig.MACDescription.DentistAssistant,
             codeInterpreterEnabled: true
         })
 
-        const loan_application_assistant_agentAlias = new _bedrock.CfnAgentAlias(this, 'loan_application_assistant_agentAlias', {
-            agentAliasName: `loan_application_assistant`,
-            agentId: this.loan_application_assistant_agent.agentId,
+        const dentist_assistant_agentAlias = new _bedrock.CfnAgentAlias(this, 'dentist_assistant_agentAlias', {
+            agentAliasName: `dentist_assistant`,
+            agentId: this.dentist_assistant_agent.agentId,
         });
 
-        this.loan_application_assistant_agent.addActionGroup(LoanAssistantActionGroup)
+        this.dentist_assistant_agent.addActionGroup(DentistAssistantActionGroup)
 
         /* SUPERVISOR AGENT */
-        const loan_assistant_agent = new BedrockMacAgent(this, "loan_assistant_agent", {
-            agentName: `loan_assistant`,
+        const dental_assistant_agent = new BedrockMacAgent(this, "dental_assistant_agent", {
+            agentName: `dental_assistant`,
             agentCollaboration: 'SUPERVISOR_ROUTER',
-            instruction: MACConfig.MACAgentInstruction.LoanAssistant,
-            description: MACConfig.MACDescription.LoanAssistant,
+            instruction: MACConfig.MACAgentInstruction.DentalAssistant,
+            description: MACConfig.MACDescription.DentalAssistant,
             agentResourceRoleArn: agent_role.roleArn,
             foundationModel: MACConfig.FoundationModel.Nova_Pro,
             codeInterpreterEnabled: true,
             associateCollaborators: [
                 {
-                    "sub_agent_association_name": `broker_agent`, "sub_agent_alias_arn": broker_agentAlias.attrAgentAliasArn,
-                    "sub_agent_instruction": MACConfig.MACCollaborationInstruction.BrokerAgent
+                    "sub_agent_association_name": `technician_agent`, 
+                    "sub_agent_alias_arn": technician_agentAlias.attrAgentAliasArn,
+                    "sub_agent_instruction": MACConfig.MACCollaborationInstruction.TechnicianAgent
                 },
                 {
-                    "sub_agent_association_name": `loan_application_assistant_agent`, "sub_agent_alias_arn": loan_application_assistant_agentAlias.attrAgentAliasArn,
-                    "sub_agent_instruction": MACConfig.MACCollaborationInstruction.LoanAppAssistant
+                    "sub_agent_association_name": `dentist_assistant_agent`, 
+                    "sub_agent_alias_arn": dentist_assistant_agentAlias.attrAgentAliasArn,
+                    "sub_agent_instruction": MACConfig.MACCollaborationInstruction.DentistAssistant
                 },
             ],
         });
-        loan_assistant_agent.node.addDependency(this.loan_application_assistant_agent);
+        dental_assistant_agent.node.addDependency(this.dentist_assistant_agent);
 
-        this.agentId = loan_assistant_agent.agentId;
-        this.agentAliasId = loan_assistant_agent.agentAliasId;
+        this.agentId = dental_assistant_agent.agentId;
+        this.agentAliasId = dental_assistant_agent.agentAliasId;
 
         new cdk.CfnOutput(this, 'AgentId', {
             value: this.agentId,

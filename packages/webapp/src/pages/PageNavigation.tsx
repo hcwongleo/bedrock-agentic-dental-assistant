@@ -13,16 +13,16 @@ export const AppRoutes = {
         href: "/",
     },
     review: {
-        text: "Review",
+        text: "Order Review",
         href: "/review",
     },
     chat: {
-        text: "Chat",
+        text: "Order Processing",
         href: "/chat",
     },
     portal: {
-        text: "Portal",
-        href: "/portal/:applicationId",
+        text: "Order Details",
+        href: "/portal/:orderId",
     }
 }
 
@@ -44,7 +44,7 @@ export const AppSideNavigation = () => {
                 { type: "link", text: AppRoutes.home.text, href: AppRoutes.home.href },
                 {
                     type: "section",
-                    text: "Demos",
+                    text: "Dental Orders",
                     items: [
                         {
                             type: "link", text: AppRoutes.chat.text, href: AppRoutes.chat.href
@@ -74,7 +74,7 @@ export const PageContent = () => {
             <Route path={AppRoutes.home.href} element={<Home />} />
             <Route path={AppRoutes.review.href} element={<Review />} />
             <Route path={AppRoutes.chat.href} element={<Chat />} />
-            <Route path="/portal/:applicationId" element={<Portal />} />
+            <Route path="/portal/:orderId" element={<Portal />} />
         </Routes>
     )
 }

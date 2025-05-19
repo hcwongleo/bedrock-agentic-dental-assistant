@@ -25,7 +25,7 @@ const StackSuppressions: NagPackSuppression[] = [{
 ]
 
 
-const infraStack = new InfraStack(app, "AutoLoanAPP", {
+const infraStack = new InfraStack(app, "DentalAssistantApp", {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -42,7 +42,7 @@ const infraStack = new InfraStack(app, "AutoLoanAPP", {
 
 });
 
-cdk.Tags.of(infraStack).add("project", "auto-loan")
+cdk.Tags.of(infraStack).add("project", "dental-assistant")
 
 // Add CDK Nag for infra security
 cdk.Aspects.of(app).add(new AwsSolutionsChecks());

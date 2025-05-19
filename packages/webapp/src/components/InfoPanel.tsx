@@ -56,22 +56,22 @@ export const InfoPanel = () => {
         {
             title: "System Architecture Overview",
             image: topArchitecture,
-            description: "High-level overview of the Auto Loan Application system architecture, showcasing how Amazon Bedrock's capabilities are integrated to provide intelligent document processing and automated assistance."
+            description: "High-level overview of the Automated Dental Assistant system architecture, showcasing how Amazon Bedrock's capabilities are integrated to provide intelligent order processing and automated assistance."
         },
         {
             title: "Architecture Diagram",
             image: architectureImage,
-            description: "Complete solution architecture showcasing the integration of AWS services including AppSync, Lambda, S3, and Amazon Bedrock for intelligent document processing and loan application assistance."
+            description: "Complete solution architecture showcasing the integration of AWS services including AppSync, Lambda, S3, and Amazon Bedrock for intelligent dental order processing and validation."
         },
         {
-            title: "Loan Applicant Assistant",
+            title: "Dentist Assistant",
             image: loanApplicantAssistant,
-            description: "AI-powered assistant helping loan applicants navigate through the application process, document requirements, and providing real-time guidance for successful submission."
+            description: "AI-powered assistant helping dentists navigate through the order process, providing real-time guidance for successful submission of dental orders."
         },
         {
-            title: "Broker Assistant",
+            title: "Technician Assistant",
             image: brokerAssistant,
-            description: "Intelligent broker assistant leveraging Amazon Bedrock for automated document analysis, validation, and generation of approval letters, streamlining the loan processing workflow."
+            description: "Intelligent technician assistant leveraging Amazon Bedrock for automated order analysis, validation, and verification, streamlining the dental order processing workflow."
         }
     ];
 

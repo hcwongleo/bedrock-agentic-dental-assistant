@@ -21,7 +21,7 @@ export class InfraStack extends cdk.Stack {
 
     /* MAC Stack */
     const macStack = new MacStack(this, "mac-stack", props)
-    cdk.Tags.of(macStack).add("project", "mac-stack")
+    cdk.Tags.of(macStack).add("project", "dental-assistant-mac-stack")
 
     NagSuppressions.addStackSuppressions(macStack, [{
       id: "AwsSolutions-IAM4",
