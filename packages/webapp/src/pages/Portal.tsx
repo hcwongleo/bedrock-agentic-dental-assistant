@@ -37,11 +37,12 @@ export const Portal = () => {
     const handleGenerateClick = () => {
         const initialFormData = {
             date: new Date().toISOString().split('T')[0],
-            dentistName: applicationData.applicant_details.primary_borrower.name,
+            dentistName: applicationData.applicant_details?.primary_borrower?.name || 
+                         applicationData.dentist_name || 'Unknown Dentist',
             dentalPractice: applicationData?.dental_practice || 'Smile Dental Clinic',
             patientId: applicationData?.patient_id || 'PT-12345',
             toothPosition: applicationData?.tooth_position || '14',
-            productType: applicationData?.product_type || 'Crown',
+            productType: applicationData?.product || applicationData?.product_type || 'Crown',
             materialCategory: applicationData?.material_category || 'Metal Free',
             material: applicationData?.material || 'e.max',
             shade: applicationData?.shade || 'A2',
@@ -156,7 +157,10 @@ export const Portal = () => {
     if (!applicationData) return null;
 
     const getMaritalStatus = (data: any) => {
-        return data?.applicant_details?.co_borrower?.name ? 'Married' : 'Single';
+        if (!data?.applicant_details?.co_borrower?.name) {
+            return 'Single';
+        }
+        return 'Married';
     };
 
     const getVerificationStatus = (bdaResult: BDAResult | undefined): {
@@ -240,7 +244,8 @@ export const Portal = () => {
                             <div>
                                 <Box variant="awsui-key-label">Dentist name</Box>
                                 <Box variant="p">
-                                    {applicationData.applicant_details.primary_borrower.name}
+                                    {applicationData.applicant_details?.primary_borrower?.name || 
+                                     applicationData.dentist_name || 'Unknown Dentist'}
                                 </Box>
                             </div>
                             <div>
@@ -300,7 +305,7 @@ export const Portal = () => {
                             <div>
                                 <Box variant="awsui-key-label">Product Type</Box>
                                 <Box variant="p">
-                                    {applicationData?.product_type || 'Crown'}
+                                    {applicationData?.product || applicationData?.product_type || 'Crown'}
                                 </Box>
                             </div>
                             <div>
