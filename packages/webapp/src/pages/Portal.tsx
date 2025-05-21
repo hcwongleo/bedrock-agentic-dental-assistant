@@ -144,7 +144,7 @@ export const Portal = () => {
     useEffect(() => {
         const fetchApplication = async () => {
             try {
-                const data = await fetchJsonFromPath(`applications/${applicationId}.json`);
+                const data = await fetchJsonFromPath(`orders/${applicationId}.json`);
                 setApplicationData(data);
             } catch (error) {
                 console.error('Error fetching application:', error);

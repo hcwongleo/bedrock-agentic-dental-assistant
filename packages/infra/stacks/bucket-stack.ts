@@ -51,7 +51,7 @@ export class BucketStack extends Stack {
 
         const prefixes = [
             'datasets/documents/',
-            'applications/',
+            'orders/',
             'bda-result-raw/',
             'bda-result/'
         ];
