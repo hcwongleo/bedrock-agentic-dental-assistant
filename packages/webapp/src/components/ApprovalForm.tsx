@@ -231,7 +231,6 @@ export const ApprovalForm: React.FC<ApprovalFormProps> = ({
                                 <Input 
                                     value={formData.estimatedDeliveryDate}
                                     onChange={e => handleInputChange('estimatedDeliveryDate', e.detail.value)}
-                                    type="date"
                                 />
                             </FormField>
                         </SpaceBetween>

@@ -122,9 +122,11 @@ export const Review = () => {
                         return {
                             orderId: jsonData.order_id || jsonData.application_id,
                             dentistName: jsonData.dentist_name || 'Unknown Dentist',
-                            toothPosition: jsonData.order_details?.tooth_position || '-',
-                            product: jsonData.order_details?.product || '-',
-                            material: `${jsonData.order_details?.material_category || ''} ${jsonData.order_details?.material || ''}`.trim() || '-',
+                            toothPosition: jsonData.tooth_position || jsonData.order_details?.tooth_position || '-',
+                            product: jsonData.product || jsonData.order_details?.product || '-',
+                            material: jsonData.material_category && jsonData.material ? 
+                                `${jsonData.material_category} ${jsonData.material}`.trim() : 
+                                `${jsonData.order_details?.material_category || ''} ${jsonData.order_details?.material || ''}`.trim() || '-',
                             status: jsonData.status || 
                             (item === orderItems[0] ? "New order" : "Under review"),
                             notes: jsonData.notes || 
