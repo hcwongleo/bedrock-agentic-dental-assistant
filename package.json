@@ -9,14 +9,14 @@
   "private": true,
   "scripts": {
     "test": "with 💖 from Gen-AI Labs",
-    "validate": "npm run synth -w infra && npm run build -w webapp",
+    "validate": "npm run -w dental-assistant-infra synth && npm run -w dental-assistant-webapp build",
     "commit": "npm run validate && npx generate-changelog && git add -A && npx cz",
-    "cli": "FORCE_COLOR=1 npm run -w infra cli",
+    "cli": "FORCE_COLOR=1 npm run -w dental-assistant-infra cli",
     "install-packages": "npm config set registry=https://registry.npmjs.com/ && npm install && cd ./packages/infra && npm install && cd ../webapp && npm install",
-    "deploy-backend": "npm run -w infra cdk-deploy",
-    "deploy-frontend": "npx tsx scripts/deploy-website.ts",
+    "deploy-backend": "npm run -w dental-assistant-infra cdk-deploy",
+    "deploy-frontend": "cd ./packages/webapp && npm run build && cd ../.. && npx tsx scripts/deploy-website.ts",
     "deploy-all": "npm run deploy-backend && npm run deploy-frontend",
-    "clean-node-modules": "FORCE_COLOR=1 npm run -w infra clean-node-modules"
+    "clean-node-modules": "FORCE_COLOR=1 npm run -w dental-assistant-infra clean-node-modules"
   },
   "author": "AWS GenAI Labs",
   "volta": {
