@@ -10,7 +10,7 @@ import { selectionAtom } from "../atoms/WizardAtoms";
 import { useMutation } from "@tanstack/react-query";
 import { addChat, removeChat, appsyncResolver, useListChatsByUser } from "../hooks/useApi";
 import { authedUserAtom } from "../atoms/AppAtoms";
-import ChatLogo from "../assets/chat_logo.png"
+// import ChatLogo from "../assets/chat_logo.png"
 import '../styles/chat.scss';
 
 export const Chat = () => {
@@ -24,11 +24,11 @@ export const Chat = () => {
     const [selection, setSelection] = useAtom(selectionAtom);
 
     const promptItems = [
-        { text: "Start my application", id: "start" },
-        { text: "Upload my driver's license", id: "license" },
-        { text: "Upload my W2", id: "w2" },
-        { text: "Upload bank statement", id: "bank" },
-        { text: "Submit my application", id: "submit" }
+        { text: "Start my dental order", id: "start" },
+        { text: "Upload my dental scan", id: "license" },
+        { text: "Upload my tooth impression", id: "w2" },
+        { text: "Upload patient records", id: "bank" },
+        { text: "Submit my order", id: "submit" }
     ];
     
     const handleScrollToEnd = useCallback(() => {
@@ -77,8 +77,8 @@ export const Chat = () => {
     const handleQuickAction = (action: string) => {
         switch (action) {
             case 'start':
-                setPrompt('Start my application');
-                onPromptSend({ detail: { value: 'Start my application' } });
+                setPrompt('Start my dental order');
+                onPromptSend({ detail: { value: 'Start my dental order' } });
                 break;
             case 'license':
             case 'w2':
@@ -86,8 +86,8 @@ export const Chat = () => {
                 handleModalOpen();
                 break;
             case 'submit':
-                setPrompt('Submit my application');
-                onPromptSend({ detail: { value: 'Submit my application' } });
+                setPrompt('Submit my dental order');
+                onPromptSend({ detail: { value: 'Submit my dental order' } });
                 break;
         }
     };
@@ -210,7 +210,7 @@ export const Chat = () => {
                                 </Button>
                             </SpaceBetween>
                         }
-                    >Loan Application Assistant</Header>}
+                    >Automated Dental Assistant</Header>}
                     fitHeight
                     disableContentPaddings
                     footer={
@@ -275,13 +275,13 @@ export const Chat = () => {
                       ref={messagesContainerRef}
                     >
                         <Box textAlign="center" padding={{ top: 'xxl', bottom: 'l' }} >
-                            <img 
+                            {/* <img 
                                 src={ChatLogo} 
                                 alt="Chat Logo" 
                                 style={{ 
                                     padding: '16px'
                                 }} 
-                            />
+                            /> */}
                         </Box>
                         <ChatMessages onNewMessage={handleScrollToEnd} />
                     </ScrollableContainer>

@@ -3,7 +3,7 @@ export enum QUERY_KEYS {
     TODOS = "TODOS",
     CHATS = "CHATS",
     DOCUMENTS = "DOCUMENTS",
-    APPLICATIONS = 'APPLICATIONS',
+    ORDERS = 'ORDERS',
     BDA_RESULTS = 'BDA_RESULTS',
 }
 
@@ -12,7 +12,7 @@ export enum QUERY_KEYS {
 export const DatasetPrefix = {
     [QUERY_KEYS.CAROUSAL]: "carousal/",
     [QUERY_KEYS.DOCUMENTS]: "datasets/documents/",
-    [QUERY_KEYS.APPLICATIONS]: 'applications/',
+    [QUERY_KEYS.ORDERS]: 'applications/',
     [QUERY_KEYS.BDA_RESULTS]: 'bda-result/',
 }
 

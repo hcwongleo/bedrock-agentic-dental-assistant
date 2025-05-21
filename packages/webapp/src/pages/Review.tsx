@@ -19,19 +19,19 @@ import { QUERY_KEYS } from "../utils/types";
 import { useQueryClient } from '@tanstack/react-query';
 import { remove } from 'aws-amplify/storage';
   
-interface ApplicationData {
-    applicationId: string;
-    applicantName: string;
-    loanAmount: number;
-    ltvRatio: number;
-    propertyAddress: string;
+interface DentalOrderData {
+    orderId: string;
+    dentistName: string;
+    toothPosition: string;
+    product: string;
+    material: string;
     status: string;
     notes: string;
     timestamp: string;
 }
 
 interface FilterToken extends PropertyFilterProps.Token {
-    propertyKey: keyof ApplicationData;
+    propertyKey: keyof DentalOrderData;
     operator: ":" | "=" | "!=" | ">" | "<";
     value: string;
 }
@@ -41,17 +41,17 @@ interface FilterQuery extends PropertyFilterProps.Query {
     operation: 'and' | 'or';
 }
 
-const filterApplications = (
-    applications: ApplicationData[], 
+const filterOrders = (
+    orders: DentalOrderData[], 
     query: PropertyFilterProps.Query
 ) => {
-    if (!query.tokens.length) return applications;
+    if (!query.tokens.length) return orders;
 
-    return applications.filter(app => {
+    return orders.filter(order => {
         const results = query.tokens.map(token => {
             if (!token.propertyKey) return true;
             
-            const value = String(app[token.propertyKey as keyof ApplicationData]);
+            const value = String(order[token.propertyKey as keyof DentalOrderData]);
             
             switch (token.operator) {
                 case ":":
@@ -78,41 +78,41 @@ const filterApplications = (
 export const Review = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const { data: applicationItems, isLoading, refetch } = useS3ListItems(QUERY_KEYS.APPLICATIONS);
-    const [applications, setApplications] = useState<ApplicationData[]>([]);
+    const { data: orderItems, isLoading, refetch } = useS3ListItems(QUERY_KEYS.ORDERS);
+    const [orders, setOrders] = useState<DentalOrderData[]>([]);
     const [query, setQuery] = useState<PropertyFilterProps.Query>({
         tokens: [],
         operation: "and"
       });
-    const filteredApplications = filterApplications(applications, query);
+    const filteredOrders = filterOrders(orders, query);
     const [isDeleted, setIsDeleted] = useState(false);
 
-    const getApplicationCounts = (applications: ApplicationData[]) => {
+    const getOrderCounts = (orders: DentalOrderData[]) => {
         return {
-            new: applications.filter(app => app.status === "New application").length,
-            underReview: applications.filter(app => app.status === "Under review").length,
-            awaitingDocs: applications.filter(app => app.status.startsWith("Awaiting")).length
+            new: orders.filter(order => order.status === "New order").length,
+            underReview: orders.filter(order => order.status === "Under review").length,
+            awaitingApproval: orders.filter(order => order.status.startsWith("Awaiting")).length
         };
     };
 
     useEffect(() => {
         queryClient.invalidateQueries({ 
-            queryKey: [QUERY_KEYS.APPLICATIONS] 
+            queryKey: [QUERY_KEYS.ORDERS] 
         });
         refetch();
     }, [refetch]); 
 
     useEffect(() => {
-        console.log('Application Items:', applicationItems);
-        if (!applicationItems) {
-            setApplications([]);
+        console.log('Order Items:', orderItems);
+        if (!orderItems) {
+            setOrders([]);
             return;
         }
 
-        const fetchApplications = async () => {
+        const fetchOrders = async () => {
             try {
-                const applicationsData = await Promise.all(
-                    applicationItems.map(async (item) => {
+                const ordersData = await Promise.all(
+                    orderItems.map(async (item) => {
                         const fullPath = `${item.path}${item.itemName}`;
                         const jsonData = await fetchJsonFromPath(fullPath);
                         if (!jsonData || typeof jsonData === 'string') {
@@ -120,51 +120,47 @@ export const Review = () => {
                             return null;
                         }
                         return {
-                            applicationId: jsonData.application_id,
-                            applicantName: `${jsonData.applicant_details.primary_borrower.name}${
-                                jsonData.applicant_details.co_borrower?.name 
-                                ? `, ${jsonData.applicant_details.co_borrower.name}` 
-                                : ''
-                            }`,
-                            loanAmount: jsonData.property_details.mortgage_amount,
-                            ltvRatio: jsonData.property_details.financing_percentage,
-                            propertyAddress: jsonData.property_details.address || jsonData.property_details.property_address,
+                            orderId: jsonData.order_id || jsonData.application_id,
+                            dentistName: jsonData.dentist_name || 'Unknown Dentist',
+                            toothPosition: jsonData.order_details?.tooth_position || '-',
+                            product: jsonData.order_details?.product || '-',
+                            material: `${jsonData.order_details?.material_category || ''} ${jsonData.order_details?.material || ''}`.trim() || '-',
                             status: jsonData.status || 
-                            (item === applicationItems[0] ? "New application" : "Under review"),
+                            (item === orderItems[0] ? "New order" : "Under review"),
                             notes: jsonData.notes || 
-                            (item === applicationItems[0] ? "New submission, needs review" : "-"),
+                            (item === orderItems[0] ? "New submission, needs review" : "-"),
                             timestamp: jsonData.timestamp
                         };
                     })
                 );
                 
                 // Filter out any null values and sort by timestamp
-                const validApplications = applicationsData
-                    .filter(app => app !== null)
+                const validOrders = ordersData
+                    .filter(order => order !== null)
                     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                    .map((app, index) => ({
-                        ...app,
-                        status: index === 0 ? "New application" : app.status,
-                        notes: index === 0 ? "New submission, needs review" : (app.notes || "-")
+                    .map((order, index) => ({
+                        ...order,
+                        status: index === 0 ? "New order" : order.status,
+                        notes: index === 0 ? "New submission, needs review" : (order.notes || "-")
                     }));
 
-                console.log('Processed and sorted applications:', validApplications);
-                setApplications(validApplications);
+                console.log('Processed and sorted orders:', validOrders);
+                setOrders(validOrders);
             } catch (error) {
-                console.error('Error loading applications:', error);
+                console.error('Error loading orders:', error);
             }
         };
 
-        fetchApplications();
-    }, [applicationItems]);
+        fetchOrders();
+    }, [orderItems]);
   
     return(
         <SpaceBetween size="l">
             <BreadcrumbGroup
               items={[
-              { text: "Morgage Loan Approval", href: "/" },
+              { text: "Dental Order System", href: "/" },
               {
-                  text: "Loan Application List",
+                  text: "Dental Order List",
                   href: "#"
               }
               ]}
@@ -172,20 +168,20 @@ export const Review = () => {
             />
 
             <Container
-                header={<Header variant="h2">Application Overview</Header>}
+                header={<Header variant="h2">Order Overview</Header>}
             >
                 <ColumnLayout columns={3} variant="text-grid">
                     <div>
-                        <Box variant="awsui-key-label">New Applications</Box>
-                        <Box variant="awsui-value-large">{getApplicationCounts(applications).new}</Box>
+                        <Box variant="awsui-key-label">New Orders</Box>
+                        <Box variant="awsui-value-large">{getOrderCounts(orders).new}</Box>
                     </div>
                     <div>
                         <Box variant="awsui-key-label">Under Review</Box>
-                        <Box variant="awsui-value-large">{getApplicationCounts(applications).underReview}</Box>
+                        <Box variant="awsui-value-large">{getOrderCounts(orders).underReview}</Box>
                     </div>
                     <div>
-                        <Box variant="awsui-key-label">Awaiting Additional Documents</Box>
-                        <Box variant="awsui-value-large">{getApplicationCounts(applications).awaitingDocs}</Box>
+                        <Box variant="awsui-key-label">Awaiting Approval</Box>
+                        <Box variant="awsui-value-large">{getOrderCounts(orders).awaitingApproval}</Box>
                     </div>
                 </ColumnLayout>
             </Container>
@@ -194,25 +190,31 @@ export const Review = () => {
             <PropertyFilter
                 query={query}
                 onChange={({ detail }) => setQuery(detail)}
-                filteringPlaceholder="Find application by applicant's name, email or phone number"
+                filteringPlaceholder="Find order by dentist name, tooth position, or product"
                 filteringProperties={[
                     {
-                        key: "applicationId",
+                        key: "orderId",
                         operators: [":", "=", "!="],
-                        propertyLabel: "Application ID",
-                        groupValuesLabel: "Application ID values"
+                        propertyLabel: "Order ID",
+                        groupValuesLabel: "Order ID values"
                     },
                     {
-                        key: "applicantName",
+                        key: "dentistName",
                         operators: [":", "=", "!="],
-                        propertyLabel: "Applicant name",
-                        groupValuesLabel: "Applicant names"
+                        propertyLabel: "Dentist name",
+                        groupValuesLabel: "Dentist names"
                     },
                     {
-                        key: "loanAmount",
-                        operators: ["=", "!=", ">", "<"],
-                        propertyLabel: "Loan Amount",
-                        groupValuesLabel: "Loan amounts"
+                        key: "toothPosition",
+                        operators: [":", "=", "!="],
+                        propertyLabel: "Tooth Position",
+                        groupValuesLabel: "Tooth positions"
+                    },
+                    {
+                        key: "product",
+                        operators: ["=", "!="],
+                        propertyLabel: "Product",
+                        groupValuesLabel: "Product types"
                     },
                     {
                         key: "status",
@@ -223,62 +225,64 @@ export const Review = () => {
                 ]}
                 filteringOptions={[
                     // Add some common values for filtering
-                    { propertyKey: "status", value: "New application" },
+                    { propertyKey: "status", value: "New order" },
                     { propertyKey: "status", value: "Under review" },
-                    { propertyKey: "status", value: "Awaiting updated W2" },
-                    { propertyKey: "status", value: "Awaiting contract" }
+                    { propertyKey: "status", value: "Awaiting approval" },
+                    { propertyKey: "product", value: "Crown" },
+                    { propertyKey: "product", value: "Bridge" },
+                    { propertyKey: "product", value: "Veneer" }
                 ]}
             />
     
             <Table
                 loading={isLoading}
-                loadingText="Loading applications"
-                items={filteredApplications}
+                loadingText="Loading dental orders"
+                items={filteredOrders}
                 columnDefinitions={[
                 {
-                    id: "applicationId",
-                    header: "Application ID",
+                    id: "orderId",
+                    header: "Order ID",
                     cell: item => {
-                        const isLatest = item === applications[0];
+                        const isLatest = item === orders[0];
                         if (isLatest) {
                             return (
                                 <Link
-                                    onClick={() => navigate(`/portal/${item.applicationId}`)}
+                                    onClick={() => navigate(`/portal/${item.orderId}`)}
                                 >
-                                    {item.applicationId}
+                                    {item.orderId}
                                 </Link>
                             );
                         }
-                        return item.applicationId;
+                        return item.orderId;
                     },
-                    sortingField: "applicationId"
+                    sortingField: "orderId"
                 },
                 {
-                    id: "applicantName",
-                    header: "Applicant name",
-                    cell: item => item.applicantName,
-                    sortingField: "applicantName"
+                    id: "dentistName",
+                    header: "Dentist Name",
+                    cell: item => item.dentistName,
+                    sortingField: "dentistName"
                 },
                 {
-                    id: "loanAmount",
-                    header: "Loan Amount Requested",
-                    cell: item => `$${item.loanAmount.toLocaleString()}`,
-                    sortingField: "loanAmount"
+                    id: "toothPosition",
+                    header: "Tooth Position",
+                    cell: item => item.toothPosition,
+                    sortingField: "toothPosition"
                 },
                 {
-                    id: "ltvRatio",
-                    header: "Loan-to-Value Ratio",
-                    cell: item => `${item.ltvRatio}%`,
-                    sortingField: "ltvRatio"
+                    id: "product",
+                    header: "Product",
+                    cell: item => item.product,
+                    sortingField: "product"
                 },
                 {
-                    id: "propertyAddress",
-                    header: "Property Address",
-                    cell: item => item.propertyAddress
+                    id: "material",
+                    header: "Material",
+                    cell: item => item.material
                 },
                 {
                     id: "status",
-                    header: "Application Status",
+                    header: "Order Status",
                     cell: item => {
                         const getStatusType = (status: string, isLatest: boolean) => {
                             if (isLatest) return "info";
@@ -286,14 +290,14 @@ export const Review = () => {
                             return "in-progress"; 
                         };
                 
-                        // Check if this is the latest application by timestamp
-                        const isLatest = item === applications[0];
+                        // Check if this is the latest order by timestamp
+                        const isLatest = item === orders[0];
                 
                         return (
                             <StatusIndicator 
                                 type={getStatusType(item.status, isLatest)}
                             >
-                                {isLatest ? "New application" : item.status}
+                                {isLatest ? "New order" : item.status}
                             </StatusIndicator>
                         )
                     }
@@ -305,7 +309,7 @@ export const Review = () => {
                 }]}
                 empty={
                     <Box textAlign="center" color="inherit">
-                        <b>No applications found</b>
+                        <b>No dental orders found</b>
                     </Box>
                 }
                 header={
@@ -315,9 +319,9 @@ export const Review = () => {
                             <Button 
                                 iconName={isDeleted ? "status-positive" : "remove"}
                                 onClick={async () => {
-                                   if (applicationItems) {
+                                   if (orderItems) {
                                        // Get the items in reverse order to get the latest one
-                                       const items = [...applicationItems].reverse();
+                                       const items = [...orderItems].reverse();
                                        console.log("Reversed items:", items);
                                        
                                        if (items.length > 0) {
@@ -330,7 +334,7 @@ export const Review = () => {
                                                console.log("File deleted successfully");
                                                
                                                queryClient.invalidateQueries({ 
-                                                   queryKey: [QUERY_KEYS.APPLICATIONS] 
+                                                   queryKey: [QUERY_KEYS.ORDERS] 
                                                });
                                                refetch();
                                                setIsDeleted(true);
@@ -347,7 +351,7 @@ export const Review = () => {
                                 {isDeleted ? "Deleted" : "Clear"}
                             </Button>
                         }
-                    >Loan Applications</Header>
+                    >Dental Orders</Header>
                 }
             />
         </SpaceBetween>

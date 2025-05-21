@@ -37,16 +37,17 @@ export const Portal = () => {
     const handleGenerateClick = () => {
         const initialFormData = {
             date: new Date().toISOString().split('T')[0],
-            applicationName: applicationData.applicant_details.primary_borrower.name,
-            mailAddress: applicationData.applicant_details.address,
-            propertyAddress: applicationData.property_details?.address || applicationData.property_details?.property_address,
-            purchasePrice: applicationData.property_details.purchase_price?.toString() || '',
-            loanAmount: applicationData.property_details.mortgage_amount.toString(),
-            loanTerms: `${applicationData.property_details.loan_term}-year conventional`,
-            propertyAddressSameAsMail: false,
-            satisfactoryPurchaseAgreement: true,
-            sufficientAppraisal: true,
-            marketableTitle: true
+            dentistName: applicationData.applicant_details.primary_borrower.name,
+            dentalPractice: applicationData?.dental_practice || 'Smile Dental Clinic',
+            patientId: applicationData?.patient_id || 'PT-12345',
+            toothPosition: applicationData?.tooth_position || '14',
+            productType: applicationData?.product_type || 'Crown',
+            materialCategory: applicationData?.material_category || 'Metal Free',
+            material: applicationData?.material || 'e.max',
+            shade: applicationData?.shade || 'A2',
+            ponticDesign: applicationData?.pontic_design || '-',
+            specialInstructions: applicationData?.special_instructions || 'None',
+            estimatedDeliveryDate: applicationData?.delivery_date || new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0]
         };
         setSelectedDocument(null); // Close document preview if open
         setShowApprovalForm(true);
@@ -221,37 +222,37 @@ export const Portal = () => {
                 <SpaceBetween size="l">
                     <BreadcrumbGroup
                         items={[
-                            { text: "Morgage Loan Approval", href: "/" },
+                            { text: "Dental Order Processing", href: "/" },
                             { 
-                                text: "Loan Application List",
+                                text: "Dental Order List",
                                 href: "/review",
                             },
                             { 
-                                text: applicationId || 'Application Details',
+                                text: applicationId || 'Order Details',
                                 href: "#" 
                             }
                         ]}
                         ariaLabel="Breadcrumbs"
                     />
     
-                    <Container header={<Header variant="h2">Application overview</Header>}>
+                    <Container header={<Header variant="h2">Order overview</Header>}>
                         <ColumnLayout columns={4} variant="text-grid">
                             <div>
-                                <Box variant="awsui-key-label">Application name</Box>
+                                <Box variant="awsui-key-label">Dentist name</Box>
                                 <Box variant="p">
                                     {applicationData.applicant_details.primary_borrower.name}
                                 </Box>
                             </div>
                             <div>
-                                <Box variant="awsui-key-label">Marital status</Box>
+                                <Box variant="awsui-key-label">Patient ID</Box>
                                 <Box variant="p">
-                                    {getMaritalStatus(applicationData)}
+                                    {applicationData?.patient_id || 'PT-12345'}
                                 </Box>
                             </div>
                             <div>
-                                <Box variant="awsui-key-label">Primary applicant annual income</Box>
+                                <Box variant="awsui-key-label">Order priority</Box>
                                 <Box variant="p">
-                                    ${applicationData.applicant_details.primary_borrower.annual_income.toLocaleString()}
+                                    {applicationData?.order_priority || 'Standard'}
                                 </Box>
                             </div>
                             <div>
@@ -262,96 +263,83 @@ export const Portal = () => {
                             </div>
 
                             <div>
-                                <Box variant="awsui-key-label">Co-applicant name</Box>
+                                <Box variant="awsui-key-label">Dental practice</Box>
                                 <Box variant="p">
-                                    {applicationData.applicant_details.co_borrower?.name || '-'}
+                                    {applicationData?.dental_practice || 'Smile Dental Clinic'}
                                 </Box>
                             </div>
                             <div>
-                                <Box variant="awsui-key-label">Relationship with primary applicant</Box>
+                                <Box variant="awsui-key-label">Order date</Box>
                                 <Box variant="p">
-                                {applicationData?.applicant_details?.co_borrower?.name ? 'Spouse' : '-'}
+                                    {applicationData?.order_date || new Date().toLocaleDateString()}
                                 </Box>
                             </div>
                             <div>
-                                <Box variant="awsui-key-label">Co-applicant annual income</Box>
+                                <Box variant="awsui-key-label">Required delivery date</Box>
                                 <Box variant="p">
-                                    {applicationData?.applicant_details?.co_borrower?.annual_income 
-                                        ? `$${applicationData.applicant_details.co_borrower.annual_income.toLocaleString()}`
-                                        : '-'}
+                                    {applicationData?.delivery_date || '-'}
                                 </Box>
                             </div>
                             <div>
                                 <Box variant="awsui-key-label">Email</Box>
                                 <Box variant="p">
-                                    doefamily@gmail.com
+                                    dental@example.com
                                 </Box>
                             </div>
                         </ColumnLayout>
                     </Container>
     
-                    <Container header={<Header variant="h2">Loan details</Header>}>
+                    <Container header={<Header variant="h2">Order details</Header>}>
                         <ColumnLayout columns={4} variant="text-grid">
                             <div>
-                                <Box variant="awsui-key-label">Loan Amount Requested</Box>
+                                <Box variant="awsui-key-label">Tooth Position</Box>
                                 <Box variant="p">
-                                    ${applicationData?.property_details?.mortgage_amount?.toLocaleString() || '-'}
+                                    {applicationData?.tooth_position || '14'}
                                 </Box>
                             </div>
                             <div>
-                                <Box variant="awsui-key-label">Loan Type</Box>
+                                <Box variant="awsui-key-label">Product Type</Box>
                                 <Box variant="p">
-                                    Fixed-rate
+                                    {applicationData?.product_type || 'Crown'}
                                 </Box>
                             </div>
                             <div>
-                                <Box variant="awsui-key-label">DTI ratio</Box>
+                                <Box variant="awsui-key-label">Material Category</Box>
                                 <Box variant="p">
-                                    {applicationData?.debt_to_income ? (
-                                        <>
-                                            {applicationData.debt_to_income}%
-                                            <Button 
-                                                variant="inline-icon" 
-                                                iconName={Number(applicationData.debt_to_income) >= 43 ? "face-sad" : "face-happy"}
-                                                ariaLabel={`DTI ratio ${applicationData.debt_to_income}% is ${Number(applicationData.debt_to_income) >= 43 ? 'above' : 'below'} 43%`}
-                                            />
-                                        </>
-                                    ) : (
-                                        '-'
-                                    )}
+                                    {applicationData?.material_category || 'Metal Free'}
                                 </Box>
                             </div>
                             <div>
-                                <Box variant="awsui-key-label">Down payment</Box>
+                                <Box variant="awsui-key-label">Material</Box>
                                 <Box variant="p">
-                                    ${applicationData?.property_details?.down_payment?.toLocaleString() || '-'}
+                                    {applicationData?.material || 'e.max'}
                                 </Box>
                             </div>
 
                             <div>
-                                <Box variant="awsui-key-label">Loan-to-Value (LTV) Ratio</Box>
+                                <Box variant="awsui-key-label">Shade</Box>
                                 <Box variant="p">
-                                    {applicationData?.property_details?.financing_percentage || '-'}%
+                                    {applicationData?.shade || 'A2'}
                                 </Box>
                             </div>
                             <div>
-                                <Box variant="awsui-key-label">Loan Term</Box>
+                                <Box variant="awsui-key-label">Pontic Design</Box>
                                 <Box variant="p">
-                                    {applicationData?.property_details?.loan_term || '30'} Years
+                                    {applicationData?.pontic_design || '-'}
                                 </Box>
                             </div>
                             <div>
-                                <Box variant="awsui-key-label">Co-applicant included</Box>
+                                <Box variant="awsui-key-label">Special Instructions</Box>
+                                <Box variant="p">
+                                    {applicationData?.special_instructions || 'None'}
+                                </Box>
+                            </div>
+                            <div>
+                                <Box variant="awsui-key-label">Verification Status</Box>
                                 <Box variant="p">
                                     <StatusIndicator type="success">
-                                        Yes
+                                        Verified
                                     </StatusIndicator>
-                                </Box>
-                            </div>
-                            <div>
-                                <Box variant="awsui-key-label">Down payment percentage</Box>
-                                <Box variant="p">
-                                    {100 - (applicationData?.property_details?.financing_percentage || 0)}%
                                 </Box>
                             </div>
                         </ColumnLayout>
@@ -360,7 +348,7 @@ export const Portal = () => {
                     <Container 
                         header={
                             <Header variant="h2">
-                                Applicant's Files
+                                Dental Images & Files
                             </Header>
                         }
                     >
@@ -462,7 +450,7 @@ export const Portal = () => {
                     <Container
                         header={
                             <Header variant="h2">
-                                Approval Documents
+                                Order Confirmation
                                 <Link variant="info"> info</Link>
                             </Header>
                         }
@@ -514,9 +502,9 @@ export const Portal = () => {
                             ]}
                             items={[
                                 {
-                                    documentName: "Loan Approval Letter",
+                                    documentName: "Order Confirmation Letter",
                                     brief: "-",
-                                    recipient: "Applicant"
+                                    recipient: "Dentist"
                                 }
                             ]}
                             variant="embedded"
@@ -579,27 +567,27 @@ export const Portal = () => {
                                 return [
                                     {
                                         timestamp: addMinutesAndFormat(baseTime, 0), // Original timestamp
-                                        action: "Loan Application Received",
-                                        performedBy: "Applicant",
-                                        details: "Application submitted by applicant."
+                                        action: "Dental Order Received",
+                                        performedBy: "Dentist",
+                                        details: "Order submitted by dentist."
                                     },
                                     {
                                         timestamp: addMinutesAndFormat(baseTime, 30), // +30 minutes
                                         action: "Initial Review Completed",
-                                        performedBy: "Loan Approver",
-                                        details: "Verified applicant identity and documents."
+                                        performedBy: "Dental Technician",
+                                        details: "Verified tooth position and product compatibility."
                                     },
                                     {
                                         timestamp: addMinutesAndFormat(baseTime, 45), // +45 minutes
-                                        action: "Confirme doucment details",
-                                        performedBy: "AI assistant & Loan Approver",
-                                        details: "AI extracted income details; approver confirmed"
+                                        action: "Confirmed order details",
+                                        performedBy: "AI assistant & Dental Technician",
+                                        details: "AI extracted order details; technician confirmed"
                                     },
                                     {
                                         timestamp: addMinutesAndFormat(baseTime, 59), // +59 minutes
-                                        action: "Approval Letter generated",
+                                        action: "Order Confirmation generated",
                                         performedBy: "AI assistant",
-                                        details: "Approval letter generated"
+                                        details: "Order confirmation letter generated"
                                     }
                                 ];
                             })()}

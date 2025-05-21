@@ -9,8 +9,8 @@ import {
 } from "@cloudscape-design/components";
 import topArchitecture from '../assets/auto_loan_app_top.png'; 
 import architectureImage from '../assets/architecture.png';
-import loanApplicantAssistant from '../assets/loan_applicant_assistant.png';
-import brokerAssistant from '../assets/broker_assistant.png';
+import dentistAssistant from '../assets/loan_applicant_assistant.png';
+import technicianAssistant from '../assets/broker_assistant.png';
 
 interface ArchitectureModalProps {
     visible: boolean;
@@ -65,12 +65,12 @@ export const InfoPanel = () => {
         },
         {
             title: "Dentist Assistant",
-            image: loanApplicantAssistant,
+            image: dentistAssistant,
             description: "AI-powered assistant helping dentists navigate through the order process, providing real-time guidance for successful submission of dental orders."
         },
         {
             title: "Technician Assistant",
-            image: brokerAssistant,
+            image: technicianAssistant,
             description: "Intelligent technician assistant leveraging Amazon Bedrock for automated order analysis, validation, and verification, streamlining the dental order processing workflow."
         }
     ];

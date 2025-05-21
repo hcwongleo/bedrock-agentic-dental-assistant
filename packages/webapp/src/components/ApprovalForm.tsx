@@ -31,16 +31,17 @@ interface GenerateLetterResponse {
 
 interface FormData {
     date: string;
-    mailAddress: string;
-    applicationName: string;
-    propertyAddressSameAsMail: boolean;
-    propertyAddress: string;
-    purchasePrice: string;
-    loanAmount: string;
-    loanTerms: string;
-    satisfactoryPurchaseAgreement: boolean;
-    sufficientAppraisal: boolean;
-    marketableTitle: boolean;
+    dentistName: string;
+    dentalPractice: string;
+    patientId: string;
+    toothPosition: string;
+    productType: string;
+    materialCategory: string;
+    material: string;
+    shade: string;
+    ponticDesign: string;
+    specialInstructions: string;
+    estimatedDeliveryDate: string;
 }
 
 export const ApprovalForm: React.FC<ApprovalFormProps> = ({ 
@@ -49,16 +50,17 @@ export const ApprovalForm: React.FC<ApprovalFormProps> = ({
 }) => {
     const [formData, setFormData] = useState<FormData>(initialData || {
         date: new Date().toISOString().split('T')[0],
-        mailAddress: '',
-        applicationName: '',
-        propertyAddressSameAsMail: false,
-        propertyAddress: '',
-        purchasePrice: '',
-        loanAmount: '',
-        loanTerms: '30-year conventional',
-        satisfactoryPurchaseAgreement: true,
-        sufficientAppraisal: true,
-        marketableTitle: true,
+        dentistName: '',
+        dentalPractice: '',
+        patientId: '',
+        toothPosition: '',
+        productType: '',
+        materialCategory: '',
+        material: '',
+        shade: '',
+        ponticDesign: '',
+        specialInstructions: '',
+        estimatedDeliveryDate: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0]
     });
 
     const [showPreviewModal, setShowPreviewModal] = useState(false);
@@ -126,20 +128,12 @@ export const ApprovalForm: React.FC<ApprovalFormProps> = ({
 
     const handleInputChange = (field: keyof FormData, value: string | boolean) => {
         setFormData((prev: FormData) => ({ ...prev, [field]: value }));
-        
-        // If propertyAddressSameAsMail is checked, copy mail address to property address
-        if (field === 'propertyAddressSameAsMail' && value === true) {
-            setFormData((prev: FormData) => ({
-                ...prev,
-                propertyAddress: prev.mailAddress
-            }));
-          }
     };
 
     return (
     <>
         <SplitPanel 
-            header={"Loan Approval Letter"}
+            header={"Order Confirmation Letter"}
         >
             <Box padding="s">
                 <Form
@@ -172,81 +166,73 @@ export const ApprovalForm: React.FC<ApprovalFormProps> = ({
                                     onChange={e => handleInputChange('date', e.detail.value)}
                                 />
                             </FormField>
-                            <FormField label="Mail Address">
+                            <FormField label="Dentist Name">
                                 <Input 
-                                    value={formData.mailAddress}
-                                    onChange={e => handleInputChange('mailAddress', e.detail.value)}
+                                    value={formData.dentistName}
+                                    onChange={e => handleInputChange('dentistName', e.detail.value)}
                                 />
                             </FormField>
-                            <FormField label="Application name">
+                            <FormField label="Dental Practice">
                                 <Input 
-                                    value={formData.applicationName}
-                                    onChange={e => handleInputChange('applicationName', e.detail.value)}
+                                    value={formData.dentalPractice}
+                                    onChange={e => handleInputChange('dentalPractice', e.detail.value)}
                                 />
                             </FormField>
-                            <FormField label="Property Address is same to mail address">
-                                <Checkbox
-                                    checked={formData.propertyAddressSameAsMail}
-                                    onChange={e => handleInputChange('propertyAddressSameAsMail', e.detail.checked)}
+                            <FormField label="Patient ID">
+                                <Input 
+                                    value={formData.patientId}
+                                    onChange={e => handleInputChange('patientId', e.detail.value)}
                                 />
                             </FormField>
-                            <FormField label="Property Address">
+                            <FormField label="Tooth Position">
                                 <Input 
-                                    value={formData.propertyAddress}
-                                    onChange={e => handleInputChange('propertyAddress', e.detail.value)}
-                                    disabled={formData.propertyAddressSameAsMail}
+                                    value={formData.toothPosition}
+                                    onChange={e => handleInputChange('toothPosition', e.detail.value)}
                                 />
                             </FormField>
 
-                            <FormField label="Purchase Price">
+                            <FormField label="Product Type">
                                 <Input 
-                                    value={formData.purchasePrice}
-                                    onChange={e => handleInputChange('purchasePrice', e.detail.value)}
-                                    type="number"
+                                    value={formData.productType}
+                                    onChange={e => handleInputChange('productType', e.detail.value)}
                                 />
                             </FormField>
-                            <FormField label="Loan Amount">
+                            <FormField label="Material Category">
                                 <Input 
-                                    value={formData.loanAmount}
-                                    onChange={e => handleInputChange('loanAmount', e.detail.value)}
-                                    type="number"
+                                    value={formData.materialCategory}
+                                    onChange={e => handleInputChange('materialCategory', e.detail.value)}
                                 />
                             </FormField>
-                            <FormField label="Terms of Loan">
+                            <FormField label="Material">
                                 <Input 
-                                    value={formData.loanTerms}
-                                    onChange={e => handleInputChange('loanTerms', e.detail.value)}
-                                    readOnly
+                                    value={formData.material}
+                                    onChange={e => handleInputChange('material', e.detail.value)}
                                 />
                             </FormField>
-
-                            <FormField 
-                                label="Conditions must be met"
-                                description="These conditions are required for loan approval"
-                            >
-                                <SpaceBetween direction="vertical" size="xs">
-                                    <Checkbox
-                                        checked={formData.satisfactoryPurchaseAgreement}
-                                        onChange={e => handleInputChange('satisfactoryPurchaseAgreement', e.detail.checked)}
-                                        controlId="satisfactoryPurchaseAgreement"
-                                    >
-                                        Satisfactory Purchase Agreement
-                                    </Checkbox>
-                                    <Checkbox
-                                        checked={formData.sufficientAppraisal}
-                                        onChange={e => handleInputChange('sufficientAppraisal', e.detail.checked)}
-                                        controlId="sufficientAppraisal"
-                                    >
-                                        Sufficient Appraisal for the Property
-                                    </Checkbox>
-                                    <Checkbox
-                                        checked={formData.marketableTitle}
-                                        onChange={e => handleInputChange('marketableTitle', e.detail.checked)}
-                                        controlId="marketableTitle"
-                                    >
-                                        Marketable Title to the Property
-                                    </Checkbox>
-                                </SpaceBetween>
+                            <FormField label="Shade">
+                                <Input 
+                                    value={formData.shade}
+                                    onChange={e => handleInputChange('shade', e.detail.value)}
+                                />
+                            </FormField>
+                            <FormField label="Pontic Design">
+                                <Input 
+                                    value={formData.ponticDesign}
+                                    onChange={e => handleInputChange('ponticDesign', e.detail.value)}
+                                />
+                            </FormField>
+                            <FormField label="Special Instructions">
+                                <Input 
+                                    value={formData.specialInstructions}
+                                    onChange={e => handleInputChange('specialInstructions', e.detail.value)}
+                                />
+                            </FormField>
+                            <FormField label="Estimated Delivery Date">
+                                <Input 
+                                    value={formData.estimatedDeliveryDate}
+                                    onChange={e => handleInputChange('estimatedDeliveryDate', e.detail.value)}
+                                    type="date"
+                                />
                             </FormField>
                         </SpaceBetween>
                     </Form>
@@ -278,7 +264,7 @@ export const ApprovalForm: React.FC<ApprovalFormProps> = ({
                     </Button>
                 }
             >
-                Preview Approval Letter
+                Preview Order Confirmation
             </Header>
             }
             size="large"
@@ -299,7 +285,7 @@ export const ApprovalForm: React.FC<ApprovalFormProps> = ({
                             size="small"
                             variant="success"
                         />
-                        Successfully sent to application email: doefamily@gmail.com
+                        Successfully sent to dental practice email: dental@example.com
                     </SpaceBetween>
                 </Box>
             )}
