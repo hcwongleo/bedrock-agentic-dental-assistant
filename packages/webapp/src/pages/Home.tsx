@@ -97,7 +97,6 @@ export const Home = () => {
                                                         display: "block"
                                                     }}
                                                 />
-                                                />
                                             </div>
                                         )
                                     }

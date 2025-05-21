@@ -1,5 +1,5 @@
 import { Box, SpaceBetween, TextContent } from "@cloudscape-design/components"
-import BotLogo from "../assets/auto_loan_app.png"
+// import BotLogo from "../assets/auotmated_dental_assistant.png"
 import { Authenticator, useTheme, View, Text, Heading, useAuthenticator, Button as AmplifyButton } from "@aws-amplify/ui-react"
 import { motion } from "motion/react"
 
@@ -127,7 +127,7 @@ export const Login = () => {
                             <Box padding={{ top: "m" }} variant="h1" textAlign="center">
                                 <TextContent>
                                     <center>
-                                        <h2 style={{ color: "black" }}>Auto Loan App</h2>
+                                        <h2 style={{ color: "black" }}>Automated Dental Assistant</h2>
                                     </center>
                                 </TextContent>
 
@@ -139,10 +139,10 @@ export const Login = () => {
                                 fontSize="heading-m"
                                 padding={{ bottom: "xs", top: "xs" }}
                             >
-                                <img src={BotLogo} alt="Logo" height={150} width={200} style={{
+                                {/* <img src={BotLogo} alt="Logo" height={150} width={200} style={{
                                     borderRadius: "1vw",
                                     boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.75)"
-                                }} />
+                                }} /> */}
                             </Box>
                             <Authenticator hideSignUp={true} components={components} formFields={formFields} />
                         </SpaceBetween>
