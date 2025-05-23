@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental Order Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+        .order-info {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .section-title {
+            background-color: #0066cc;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .form-row {
+            display: flex;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            margin-right: 20px;
+            flex: 1;
+            min-width: 200px;
+        }
+        .tooth-chart {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        .tooth-chart td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 8px;
+        }
+        .tooth-selected {
+            background-color: #ffeb3b;
+            font-weight: bold;
+        }
+        .material-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .material-column {
+            width: 32%;
+            min-width: 200px;
+            margin-bottom: 15px;
+        }
+        .material-selected {
+            font-weight: bold;
+            color: #0066cc;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .data-field {
+            font-weight: bold;
+            color: #333;
+        }
+        .barcode {
+            text-align: right;
+            font-weight: bold;
+        }
+        .contact-info {
+            font-size: 0.9em;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        @media print {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">DENTAL ORDER REPORT</div>
+        <div class="barcode">Order #: <span id="orderNumber" class="data-field">{{orderNumber}}</span></div>
+    </div>
+
+    <div class="order-info">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Doctor:</label>
+                <span id="doctor" class="data-field">{{doctor}}</span>
+            </div>
+            <div class="form-group">
+                <label>Patient:</label>
+                <span id="patient" class="data-field">{{patient}}</span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Date Sent:</label>
+                <span id="dateSent" class="data-field">{{dateSent}}</span>
+            </div>
+            <div class="form-group">
+                <label>Patient Age:</label>
+                <span id="age" class="data-field">{{age}}</span>
+            </div>
+            <div class="form-group">
+                <label>Gender:</label>
+                <span id="gender" class="data-field">{{gender}}</span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Bill to Dr. Code:</label>
+                <span id="billTo" class="data-field">{{billTo}}</span>
+            </div>
+            <div class="form-group">
+                <label>Deliver to Dr. Code:</label>
+                <span id="deliverTo" class="data-field">{{deliverTo}}</span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Date Required:</label>
+                <span id="dateRequired" class="data-field">{{dateRequired}}</span>
+            </div>
+            <div class="form-group">
+                <label>Time:</label>
+                <span id="timeRequired" class="data-field">{{timeRequired}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-info">
+        <p>Pick Up: +852 3766 0771<br>
+        Customer Service: +852 3766 0888<br>
+        Fax: +852 3766 0700</p>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">Tooth Position</h3>
+        <table class="tooth-chart">
+            <tr>
+                <td id="tooth-18" class="{{isSelected18}}">18</td>
+                <td id="tooth-17" class="{{isSelected17}}">17</td>
+                <td id="tooth-16" class="{{isSelected16}}">16</td>
+                <td id="tooth-15" class="{{isSelected15}}">15</td>
+                <td id="tooth-14" class="{{isSelected14}}">14</td>
+                <td id="tooth-13" class="{{isSelected13}}">13</td>
+                <td id="tooth-12" class="{{isSelected12}}">12</td>
+                <td id="tooth-11" class="{{isSelected11}}">11</td>
+                <td id="tooth-21" class="{{isSelected21}}">21</td>
+                <td id="tooth-22" class="{{isSelected22}}">22</td>
+                <td id="tooth-23" class="{{isSelected23}}">23</td>
+                <td id="tooth-24" class="{{isSelected24}}">24</td>
+                <td id="tooth-25" class="{{isSelected25}}">25</td>
+                <td id="tooth-26" class="{{isSelected26}}">26</td>
+                <td id="tooth-27" class="{{isSelected27}}">27</td>
+                <td id="tooth-28" class="{{isSelected28}}">28</td>
+            </tr>
+            <tr>
+                <td id="tooth-48" class="{{isSelected48}}">48</td>
+                <td id="tooth-47" class="{{isSelected47}}">47</td>
+                <td id="tooth-46" class="{{isSelected46}}">46</td>
+                <td id="tooth-45" class="{{isSelected45}}">45</td>
+                <td id="tooth-44" class="{{isSelected44}}">44</td>
+                <td id="tooth-43" class="{{isSelected43}}">43</td>
+                <td id="tooth-42" class="{{isSelected42}}">42</td>
+                <td id="tooth-41" class="{{isSelected41}}">41</td>
+                <td id="tooth-31" class="{{isSelected31}}">31</td>
+                <td id="tooth-32" class="{{isSelected32}}">32</td>
+                <td id="tooth-33" class="{{isSelected33}}">33</td>
+                <td id="tooth-34" class="{{isSelected34}}">34</td>
+                <td id="tooth-35" class="{{isSelected35}}">35</td>
+                <td id="tooth-36" class="{{isSelected36}}">36</td>
+                <td id="tooth-37" class="{{isSelected37}}">37</td>
+                <td id="tooth-38" class="{{isSelected38}}">38</td>
+            </tr>
+        </table>
+        <div>
+            <strong>Selected Teeth:</strong> <span id="selectedTeeth" class="data-field">{{selectedTeeth}}</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">Material Choice</h3>
+        <div class="material-options">
+            <div class="material-column">
+                <h4>PFM</h4>
+                <div>
+                    <span id="highPrecious" class="{{isHighPrecious}}">High Precious</span>
+                </div>
+                <div>
+                    <span id="semiPrecious" class="{{isSemiPrecious}}">Semi Precious</span>
+                </div>
+                <div>
+                    <span id="palladium" class="{{isPalladium}}">Palladium Based</span>
+                </div>
+                <div>
+                    <span id="titanium" class="{{isTitanium}}">Titanium</span>
+                </div>
+                <div>
+                    <span id="npNiFree" class="{{isNpNiFree}}">NP (Ni Free)*</span>
+                </div>
+            </div>
+            
+            <div class="material-column">
+                <h4>Full Cast</h4>
+                <div>
+                    <span id="yellowGold" class="{{isYellowGold}}">Yellow Gold</span>
+                </div>
+                <div>
+                    <span id="whiteGold" class="{{isWhiteGold}}">White Gold</span>
+                </div>
+                <div>
+                    <span id="titaniumFull" class="{{isTitaniumFull}}">Titanium</span>
+                </div>
+                <div>
+                    <span id="npNiFreeFull" class="{{isNpNiFreeFull}}">NP (Ni Free)*</span>
+                </div>
+            </div>
+            
+            <div class="material-column">
+                <h4>Metal Free</h4>
+                <div>
+                    <span id="calypso" class="{{isCalypso}}">Calypso</span>
+                </div>
+                <div>
+                    <span id="emax" class="{{isEmax}}">e.max</span>
+                </div>
+                <div>
+                    <span id="zirconia" class="{{isZirconia}}">Zirconia</span>
+                </div>
+                <div>
+                    <span id="composite" class="{{isComposite}}">Composite</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">Restoration Type</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <strong>Type:</strong> <span id="restorationType" class="data-field">{{restorationType}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">Additional Instructions</h3>
+        <div id="additionalInstructions" class="data-field">{{additionalInstructions}}</div>
+    </div>
+
+    <div class="footer">
+        <p>Report generated on {{generationDate}}</p>
+        <p>This is an automated report generated from the dental order processing system.</p>
+    </div>
+
+    <script>
+        // This script would be used to populate the template with actual data
+        // In a real implementation, you would replace the {{variables}} with actual data
+        
+        // Example of how to highlight selected teeth
+        function highlightSelectedTeeth(teethArray) {
+            teethArray.forEach(tooth => {
+                const element = document.getElementById(`tooth-${tooth}`);
+                if (element) {
+                    element.classList.add('tooth-selected');
+                }
+            });
+        }
+        
+        // Example of how to mark selected materials
+        function markSelectedMaterials(materials) {
+            materials.forEach(material => {
+                const element = document.getElementById(material);
+                if (element) {
+                    element.classList.add('material-selected');
+                }
+            });
+        }
+        
+        // These functions would be called with actual data when the report is generated
+    </script>
+</body>
+</html>

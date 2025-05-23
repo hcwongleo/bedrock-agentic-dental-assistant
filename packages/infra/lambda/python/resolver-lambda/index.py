@@ -191,24 +191,36 @@ def lambda_handler(event, context):
         
         elif args["opr"] == "generate_approval_letter":
             try:
-                # Format the form data as a JSON string matching the expected input format
-                input_data = {
-                    "applicationName": args.get("applicationName", ""),
-                    "date": args.get("date", ""),
-                    "loanAmount": args.get("loanAmount", ""),
-                    "loanTerms": args.get("loanTerms", ""),
-                    "mailAddress": args.get("mailAddress", ""),
-                    "propertyAddress": args.get("propertyAddress", ""),
-                    "propertyAddressSameAsMail": args.get("propertyAddressSameAsMail", False),
-                    "purchasePrice": args.get("purchasePrice", ""),
-                    "satisfactoryPurchaseAgreement": args.get("satisfactoryPurchaseAgreement", True),
-                    "sufficientAppraisal": args.get("sufficientAppraisal", True),
-                    "marketableTitle": args.get("marketableTitle", True)
-                }
+                # Get the actual values from the form data
+                date = args.get("date", "")
+                dentist_name = args.get("dentistName", "")
+                dental_practice = args.get("dentalPractice", "")
+                patient_id = args.get("patientId", "")
+                tooth_position = args.get("toothPosition", "")
+                product_type = args.get("productType", "")
+                material_category = args.get("materialCategory", "")
+                material = args.get("material", "")
+                shade = args.get("shade", "")
+                pontic_design = args.get("ponticDesign", "")
+                special_instructions = args.get("specialInstructions", "")
+                estimated_delivery_date = args.get("estimatedDeliveryDate", "")
 
                 # Format the input as expected by the agent
-                message_content = create_safe_message(input_data)
-                message_content += "Genereate pre-approval letter: "
+                message_content = create_safe_message({
+                    "date": date,
+                    "dentistName": dentist_name,
+                    "dentalPractice": dental_practice,
+                    "patientId": patient_id,
+                    "toothPosition": tooth_position,
+                    "productType": product_type,
+                    "materialCategory": material_category,
+                    "material": material,
+                    "shade": shade,
+                    "ponticDesign": pontic_design,
+                    "specialInstructions": special_instructions,
+                    "estimatedDeliveryDate": estimated_delivery_date
+                })
+                message_content += "Generate pre-approval letter: "
                 
                 enable_trace = False
                 session_id = f"approval-letter-{datetime.now().strftime('%Y%m%d%H%M%S')}-{str(uuid.uuid4())[:8]}"
@@ -224,14 +236,14 @@ def lambda_handler(event, context):
                 if enable_trace:
                     print("Agent response:", response)
 
-                generated_html = ''
+                raw_content = ''
                 event_stream = response['completion']
 
                 for event in event_stream:
                     if 'chunk' in event:
                         data = event['chunk']['bytes']
                         chunk_text = data.decode('utf8')
-                        generated_html += chunk_text  # Accumulate chunks
+                        raw_content += chunk_text  # Accumulate chunks
                         print(f"Processing HTML chunk: {chunk_text}")
                         
                     elif 'trace' in event:
@@ -240,9 +252,116 @@ def lambda_handler(event, context):
                     else:
                         raise Exception("unexpected event.", event)
 
-                print(f"Final HTML response:\n{generated_html}")
+                # Convert the plain text response to proper HTML
+                html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental Order Approval</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }}
+        .approval-letter {{
+            border: 1px solid #ddd;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }}
+        h1 {{
+            color: #0066cc;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+        }}
+        .section {{
+            margin-bottom: 20px;
+        }}
+        .field {{
+            margin-bottom: 10px;
+        }}
+        .field-label {{
+            font-weight: bold;
+            display: inline-block;
+            width: 150px;
+        }}
+        .footer {{
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            font-style: italic;
+        }}
+    </style>
+</head>
+<body>
+    <div class="approval-letter">
+        <h1>Dental Order Pre-Approval</h1>
+        
+        <div class="section">
+            <div class="field">
+                <span class="field-label">Date:</span> {date}
+            </div>
+            <div class="field">
+                <span class="field-label">Dentist Name:</span> {dentist_name}
+            </div>
+            <div class="field">
+                <span class="field-label">Dental Practice:</span> {dental_practice}
+            </div>
+            <div class="field">
+                <span class="field-label">Patient ID:</span> {patient_id}
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Order Details</h2>
+            <div class="field">
+                <span class="field-label">Tooth Position:</span> {tooth_position}
+            </div>
+            <div class="field">
+                <span class="field-label">Product Type:</span> {product_type}
+            </div>
+            <div class="field">
+                <span class="field-label">Material Category:</span> {material_category}
+            </div>
+            <div class="field">
+                <span class="field-label">Material:</span> {material}
+            </div>
+            <div class="field">
+                <span class="field-label">Shade:</span> {shade}
+            </div>
+            <div class="field">
+                <span class="field-label">Pontic Design:</span> {pontic_design}
+            </div>
+            <div class="field">
+                <span class="field-label">Special Instructions:</span> {special_instructions}
+            </div>
+            <div class="field">
+                <span class="field-label">Estimated Delivery:</span> {estimated_delivery_date}
+            </div>
+        </div>
+        
+        <div class="section">
+            <p>This letter serves as pre-approval for the above dental order. Please proceed with the fabrication and delivery of the specified dental product.</p>
+            <p>Thank you for your attention to this matter.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Sincerely,<br>
+            Dental Technician<br>
+            {dental_practice}</p>
+            <p>Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+        </div>
+    </div>
+</body>
+</html>"""
+
+                print(f"Final HTML response generated")
                 
-                return success_response(generated_html)
+                return success_response(html_content)
 
             except ClientError as e:
                 logger.error(f"Error calling Bedrock Agent: {e}")

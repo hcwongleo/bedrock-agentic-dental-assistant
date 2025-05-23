@@ -6,14 +6,21 @@ import { ItemType, QUERY_KEYS, S3ItemsType, DatasetPrefix } from "../utils/types
 export const fetchJsonFromPath = async (path: string) => {
     // fetch json from URL 
     try {
+        console.log(`Attempting to download from path: ${path}`);
         const downloadResult = await downloadData({ path }).result;
         const text = await downloadResult.body.text();
-        // console.log("🚀 ~ fetchJsoFromPath ~ text:", text)
-        return JSON.parse(text);
-
+        console.log(`Downloaded data from ${path}:`, text.substring(0, 200) + (text.length > 200 ? '...' : ''));
+        
+        try {
+            const parsedData = JSON.parse(text);
+            return parsedData;
+        } catch (parseError) {
+            console.error(`Error parsing JSON from ${path}:`, parseError);
+            return null;
+        }
     } catch (e) {
-        console.log("🚀 ~ fetchJson ~ e:", e)
-        return "[]"
+        console.error(`Error downloading from ${path}:`, e);
+        return "[]";
     }
 }
 

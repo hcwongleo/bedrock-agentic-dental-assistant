@@ -119,6 +119,7 @@ export const Review = () => {
                             console.error('Invalid JSON data received');
                             return null;
                         }
+                        console.log('Processing order data in Review.tsx:', jsonData);
                         return {
                             orderId: jsonData.order_id || jsonData.application_id,
                             dentistName: jsonData.dentist_name || 'Unknown Dentist',
